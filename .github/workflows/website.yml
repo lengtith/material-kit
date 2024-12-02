@@ -1,0 +1,41 @@
+name: Deploy Website
+
+# Controls when the workflow will run
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.10.0'
+
+      - name: Install Dependencies
+        run: yarn install
+
+      # - name: Build the project
+      #   run: yarn build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-1
+
+      # Change to the build folder if necessary
+      # - name: Set working directory to build
+      #   run: cd build
+
+      # Conditional Deploy to Staging or Production based on Branch
+      - name: Deploy to AWS with SST
+        run: npx sst deploy --stage prod  # Deploy to production
